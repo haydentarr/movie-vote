@@ -1,0 +1,31 @@
+@baseUrl = http://localhost:3001/api
+
+
+# @name Guest
+GET {{baseUrl}}/auth/guest
+
+###
+
+# @name Refresh
+GET {{{baseUrl}}/auth/refresh
+
+###
+
+@authToken = {{Guest.response.body.access_token}}
+
+GET {{baseUrl}}/matching
+Authorization: Bearer {{authToken}}
+
+###
+
+@authToken = {{Guest.response.body.access_token}}
+
+POST {{baseUrl}}/users
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+	"email": "ds@gs.com",
+	"name": "test",
+	"password": "test"
+}
