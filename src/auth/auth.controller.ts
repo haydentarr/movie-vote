@@ -20,6 +20,7 @@ export class AuthController {
   }
 
   @Get('guest')
+  // Guard against users
   @UseInterceptors(new SetRefreshCookie())
   async guestSession(@Req() req): Promise<object> {
     return this.authService.guestSession(req.cookies.jwt);

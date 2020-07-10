@@ -39,7 +39,7 @@ processes=()
 # entries should be quoted like this:
 # processes+=("sleep 60")
 if [[ " $SCRIPTS " =~ " start " ]]; then
-  processes+=("$(getCommand start)")
+  processes+=("yarn start:prod")
 elif [[ -f server.js ]]; then
   processes+=("node server.js")
 elif [[ -f app.js ]]; then

@@ -7,6 +7,7 @@ import { jwtConstants } from '../common/jwt-secrets';
 import { UsersService } from '../users/users.service';
 import { User } from '../users/users.model';
 import { Tokens, Jwt } from './auth.interface';
+import { throwError } from 'rxjs';
 
 // Change tokens to environment variables
 
@@ -21,24 +22,28 @@ export class AuthService {
    * Include accesstoken in body response.
    */
   async login(user: User): Promise<Tokens> {
-    return this.getTokens({ sub: { uuid: user.uuid, email: user.email, name: user.name } });
+    return this.getTokens({ sub: { uuid: user.uuid, email: user.email, name: user.name, role: 'user' } });
   }
 
   /*
    * Guest sessions are created for anonymous users, and converted to users if they create an account
    */
   async guestSession(token?: any): Promise<Tokens> {
-    const existing = this.verifyToken(token); // If guest has valid cookie, return only access token
+    const existing = await this.verifyToken(token); // If guest has valid cookie, return only access token
+    if (existing && existing.sub.role === 'user') throw new BadRequestException('Error: You already have an account');
     if (existing) return this.getAccessToken({ sub: existing.sub });
 
-    return this.getTokens({ sub: createUUID() }); // New guest
+    Logger.log(existing);
+    return this.getTokens({
+      sub: { uuid: createUUID(), role: 'guest' },
+    }); // New guest
   }
 
   /*
    * Refresh access token by
    */
   async refreshToken(token: string): Promise<Tokens> {
-    const valid = this.verifyToken(token); // Check if refresh token is valid
+    const valid = await this.verifyToken(token); // Check if refresh token is valid
     if (!valid) throw new BadRequestException(); // If ROLE is user redirect to Logout if ROLE is Guest
 
     return this.getAccessToken({ sub: valid.sub });
@@ -66,9 +71,15 @@ export class AuthService {
    ** HELPER FUNCTIONS BELOW
    **--------------------------------------------------------*/
 
-  private verifyToken(token: string) {
-    if (!token) return;
-    return jwt.verify(token, jwtConstants.tokenSecret) as Jwt;
+  private async verifyToken(token: string) {
+    try {
+      if (!token) return;
+      return jwt.verify(token, jwtConstants.tokenSecret) as any;
+    } catch (err) {
+      // Remove user from memory
+      //
+      return false;
+    }
   }
 
   private getAccessToken(payload: object) {
@@ -77,7 +88,7 @@ export class AuthService {
 
   private getTokens(payload: object): Tokens {
     return {
-      refreshToken: jwt.sign(payload, jwtConstants.tokenSecret, { expiresIn: '14d' }),
+      refreshToken: jwt.sign(payload, jwtConstants.tokenSecret, { expiresIn: '15s' }),
       accessToken: this.jwtService.sign(payload),
     };
   }

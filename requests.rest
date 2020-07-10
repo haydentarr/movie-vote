@@ -1,4 +1,4 @@
-@baseUrl = http://localhost:3001/api
+@baseUrl = http://localhost:3000/api
 
 
 # @name Guest
@@ -11,21 +11,66 @@ GET {{{baseUrl}}/auth/refresh
 
 ###
 
-@authToken = {{Guest.response.body.access_token}}
+@authToken = {{Guest.response.body.accessToken}}
 
 GET {{baseUrl}}/matching
 Authorization: Bearer {{authToken}}
 
 ###
 
-@authToken = {{Guest.response.body.access_token}}
+# @name CreateUser
+@authToken = {{Guest.response.body.accessToken}}
 
 POST {{baseUrl}}/users
 Authorization: Bearer {{authToken}}
 Content-Type: application/json
 
 {
-	"email": "ds@gs.com",
+	"email": "test@gs.com",
 	"name": "test",
-	"password": "test"
+	"password": "password"
 }
+
+
+###
+
+# @name Login
+@authToken = {{Guest.response.body.accessToken}}
+
+POST {{baseUrl}}/auth/login
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+	"email": "test@gs.com",
+	"password": "password"
+}
+
+###
+
+# @name Get
+
+@loggedAuthToken = {{Login.response.body.accessToken}}
+
+GET {{baseUrl}}/users
+Authorization: Bearer {{loggedAuthToken}}
+Content-Type: application/json
+
+
+###
+
+GET {{baseUrl}}/users/all
+Content-Type: application/json
+
+###
+
+# @name getMovie
+
+@authToken = {{Guest.response.body.accessToken}}
+
+GET {{baseUrl}}/movies/2
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+
+###

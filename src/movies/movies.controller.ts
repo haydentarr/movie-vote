@@ -4,9 +4,10 @@ import { AuthGuard } from '@nestjs/passport';
 import { MoviesService } from './movies.service';
 import { CreateMovieDTO } from './dto/create-movies.dto';
 import { UpdateMovieDTO } from './dto/update-movies.dto';
-import { Movie } from './movies.model'
+import { Movie } from './movies.model';
+import { JwtAuthGuard } from '../common/jwt.guard';
 
-// TODO 
+// TODO
 // Add roles to routes so users can add and update movies
 
 @Controller('/api/movies')
@@ -18,7 +19,7 @@ export class MoviesController {
   addMovies(@Body() movie: CreateMovieDTO): Movie {
     return this.moviesService.insertMovie(movie);
   }
-  
+
   // For development only
   // @Get()
   // getAllMovies(): object {
@@ -26,7 +27,7 @@ export class MoviesController {
   // }
 
   // Get single movie by movie id
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(JwtAuthGuard)
   @Get(':id')
   getMovie(@Param('id', new ParseIntPipe()) movieId: number): Movie {
     return this.moviesService.getMovie(movieId);
@@ -40,4 +41,3 @@ export class MoviesController {
     return { message: 'Movie Updated' };
   }
 }
-

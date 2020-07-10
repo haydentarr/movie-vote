@@ -28,6 +28,7 @@ export class MatchingService {
     let k = userList.length - 1;
     do {
       const movie = this.moviesService.getMovie(userList[k].movieId);
+      if (userList[k].skill[0] === 25) break; // Don't include movies that are unranked
       result.push({ ...movie, rank: userList[k].skill[0] });
       k -= 1;
     } while (k > -1);
