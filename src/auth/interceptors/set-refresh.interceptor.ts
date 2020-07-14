@@ -18,7 +18,6 @@ export class SetRefreshCookie implements NestInterceptor {
       .then(res => {
         Logger.log(res.refreshToken);
         if (!res.refreshToken) return res;
-
         response.cookie('jwt', res.refreshToken, { httpOnly: true, sameSite: true });
         delete res.refreshToken;
         return res || undefined;

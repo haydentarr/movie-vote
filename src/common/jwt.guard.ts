@@ -10,8 +10,6 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
   }
 
   handleRequest(err, user, info) {
-    Logger.log(user);
-
     // Pass user/guest through the gaurd, Check user has that type of role
 
     // You can throw an exception based on either "info" or "err" arguments

@@ -33,7 +33,7 @@ export class AuthService {
     if (existing && existing.sub.role === 'user') throw new BadRequestException('Error: You already have an account');
     if (existing) return this.getAccessToken({ sub: existing.sub });
 
-    Logger.log(existing);
+    Logger.log(`Existing User: ${existing}`);
     return this.getTokens({
       sub: { uuid: createUUID(), role: 'guest' },
     }); // New guest
@@ -43,7 +43,9 @@ export class AuthService {
    * Refresh access token by
    */
   async refreshToken(token: string): Promise<Tokens> {
+    Logger.log(token);
     const valid = await this.verifyToken(token); // Check if refresh token is valid
+
     if (!valid) throw new BadRequestException(); // If ROLE is user redirect to Logout if ROLE is Guest
 
     return this.getAccessToken({ sub: valid.sub });
@@ -86,9 +88,10 @@ export class AuthService {
     return { accessToken: this.jwtService.sign(payload) };
   }
 
+  // Need to redirect to guest if refresh has expired
   private getTokens(payload: object): Tokens {
     return {
-      refreshToken: jwt.sign(payload, jwtConstants.tokenSecret, { expiresIn: '15s' }),
+      refreshToken: jwt.sign(payload, jwtConstants.tokenSecret, { expiresIn: '20s' }),
       accessToken: this.jwtService.sign(payload),
     };
   }

@@ -48,6 +48,7 @@ export class MatchingService {
   }
 
   async rankMatch(movies: RankDTO['movies'], uuid: string): Promise<object> {
+    //Logger.log(uuid);
     let k = movies.length - 1;
     const skills = [];
     const index = [];

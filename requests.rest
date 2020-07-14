@@ -18,6 +18,23 @@ Authorization: Bearer {{authToken}}
 
 ###
 
+# @name rankMovie
+@authToken = {{Guest.response.body.accessToken}}
+
+POST {{baseUrl}}/matching?movies=20,12
+Authorization: Bearer {{authToken}}
+
+###
+
+# @name listRanks
+
+@authToken = {{Guest.response.body.accessToken}}
+
+GET {{baseUrl}}/matching/list
+Authorization: Bearer {{authToken}}
+
+###
+
 # @name CreateUser
 @authToken = {{Guest.response.body.accessToken}}
 
@@ -74,3 +91,4 @@ Content-Type: application/json
 
 
 ###
+
